@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+{{ form_start(form) }}
+    {{ form_errors(form) }}
+    
+    <div>
+        {{ form_label(form.nombreUsuario) }}
+        {{ form_errors(form.nombreUsuario) }}
+        {{ form_widget(form.nombreUsuario) }}
+    </div>
+     
+    <div>
+        {{ form_label(form.estado) }}
+        {{ form_errors(form.estado) }}
+        {{ form_widget(form.estado, { 'attr':{'id':'usuario_estado'} }) }}
+        {{ form.estado.vars.id }}
+    </div>
+ 
+    <div>
+        {{ form_label(form.municipio) }}
+        {{ form_errors(form.municipio) }}
+        {{ form_widget(form.municipio, { 'attr':{'id':'usuario_municipio'} }) }}
+        {{ form.municipio.vars.id }}
+    </div>
+
+    <div>
+        {{ form_label(form.parroquia) }}
+        {{ form_errors(form.parroquia) }}
+        {{ form_widget(form.parroquia, { 'attr':{'id':'usuario_parroquia'} }) }}
+        {{ form.parroquia.vars.id }}
+    </div>
+     
+    <div>
+        <input type="submit" />
+    </div>
+{% endblock %}    
+{% block javascripts %}
+<script type="javascript">
+    var $estado = $('#usuario_estado'); 
+
+    //tambien podemos hacer $('#{{ form.estado.vars.id }}') para obtener el id
+    
+    var $form = $estado.closest('form');
+
+    // cada vez que el usuario cambie el estado en el select
+
+    $estado.on('change', function() {
+
+        // creamos la data, solo con el campo del estado,
+        // ya que es el dato relevante en este caso.
+
+        var data = $estado.serialize();
+
+        // Hacemos un envío del formulario, lo que ejecutará el evento preSubmit
+        // del listener AddMunicipioFieldSubscriber,
+        // y actualizará el campo municipio, con los municipios del estado seleccionado.
+
+        $.ajax({
+            url : "{{ path('usuario_ajax_form') }}",
+            type: $form.attr('method'),
+            data : data,
+            success: function(html) {
+
+                // la variable html representa toda la página junto con el select de estados.
+                // el cual tomamos y colocamos para reemplazar el select actual.
+
+                $('#usuario_municipio').replaceWith($(html).find('#usuario_municipio'));
+            }
+        });
+    });
+</script>
+{% endblock %}
